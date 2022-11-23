@@ -1,5 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:mm_flutter_example/FBExample.dart';
+import 'package:mm_flutter_example/FutureTest.dart';
+import 'package:mm_flutter_example/ListExample.dart';
+import 'package:mm_flutter_example/ListGame.dart';
+import 'package:mm_flutter_example/StreamExample.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,7 +46,8 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
   int _counter = 0;
 
   @override
@@ -48,16 +56,23 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     timeDilation = 5.0;
     super.initState();
   }
+
   void _incrementCounter() {
+    // final state = (globalKey.currentState as _MyHomePageState);
+    // state._counter;
+    // final curWidget = globalKey.currentWidget as MyHomePage;
+    // final curElement = globalKey.currentContext;
+    // final renderBox = globalKey.currentContext?.findRenderObject() as RenderBox;
+    // print(renderBox.size);
+
+    FutureTest().test1();
+    print("test1");
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter++;
     });
   }
+
+  var globalKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +94,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+
             const Text(
               'You have pushed the button this many times:',
             ),
@@ -90,20 +106,47 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
               duration: Duration(seconds: 2),
               child: Container(),
             ),
-            MaterialButton(onPressed: (){
-
-            },
-              child: Text('跳转列表'),
+            Flex(direction: Axis.horizontal),
+            ElevatedButton(
+              onPressed: () async {
+                // 打开`TipRoute`，并等待返回结果
+                var result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return ListGame(
+                          // 路由参数
+                          // text: "我是提示xxxx",
+                          );
+                    },
+                  ),
+                );
+                //输出`TipRoute`路由返回结果
+                print("路由返回值: $result");
+              },
+              child: Text("打开提示页"),
             ),
-            ListView.builder(
-              itemCount: 100,
-                itemBuilder: (context, index){
-              return Container(
-                color: Colors.red,
-                height: 50,
-                child: Text('$index'),
-              );
-            })
+            ElevatedButton(
+              onPressed: () async {
+                // 打开`TipRoute`，并等待返回结果
+                var result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return ListExample(
+                          // 路由参数
+                          // text: "我是提示xxxx",
+                          );
+                    },
+                  ),
+                );
+                //输出`TipRoute`路由返回结果
+                print("路由返回值: $result");
+              },
+              child: Text("打开提示页"),
+            ),
+            createRouter('FutureBuilder Example', () => const FBExample()),
+            createRouter('Stream', () => const StreamExample())
           ],
         ),
       ),
@@ -112,6 +155,16 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  Widget createRouter(String text, Widget create()) {
+    return MaterialButton(onPressed: () {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return create();
+      }));
+    },
+      child: Text(text),
     );
   }
 }

@@ -8,16 +8,30 @@ class ListExample extends StatefulWidget {
 }
 
 class _ListExampleState extends State<ListExample> {
+
+  ScrollController? _controller;
+
+  @override
+  void initState() {
+    _controller = ScrollController();
+    super.initState();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.builder(itemBuilder: (context, index){
-        return Container(
-          height: 50,
-          color: index % 2 == 0 ? Colors.blue : Colors.green,
-        );
-      },
-        itemCount: 1000,
+      body: Container(
+        child: ListView.builder(
+          itemBuilder: (context, index) {
+            return Container();
+          },
+          controller: _controller,
+          padding: EdgeInsets.all(40.0),
+          scrollDirection: Axis.vertical,
+          itemCount: 100,
+          itemExtent: 60, //强制主轴上的布局高度为60
+        ),
       ),
     );
   }
