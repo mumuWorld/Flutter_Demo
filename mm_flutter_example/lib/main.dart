@@ -89,7 +89,21 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
             AnimatedContainer(
               duration: Duration(seconds: 2),
               child: Container(),
-            )
+            ),
+            MaterialButton(onPressed: (){
+
+            },
+              child: Text('跳转列表'),
+            ),
+            ListView.builder(
+              itemCount: 100,
+                itemBuilder: (context, index){
+              return Container(
+                color: Colors.red,
+                height: 50,
+                child: Text('$index'),
+              );
+            })
           ],
         ),
       ),
