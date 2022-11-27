@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
+
 class FutureTest {
   void test1() {
     getValueEase().then((value) {
@@ -9,7 +11,7 @@ class FutureTest {
       print("get value 2 = $value");
     });
   }
-
+  
   // 推荐这种写法
   Future<int> getValueEase() async {
     return 100;
