@@ -6,6 +6,7 @@ import 'package:mm_flutter_example/FBExample.dart';
 import 'package:mm_flutter_example/FutureTest.dart';
 import 'package:mm_flutter_example/ListExample.dart';
 import 'package:mm_flutter_example/ListGame.dart';
+import 'package:mm_flutter_example/SliverExample.dart';
 import 'package:mm_flutter_example/StreamExample.dart';
 
 void main() {
@@ -146,7 +147,8 @@ class _MyHomePageState extends State<MyHomePage>
               child: Text("打开提示页"),
             ),
             createRouter('FutureBuilder Example', () => const FBExample()),
-            createRouter('Stream', () => const StreamExample())
+            createRouter('Stream', () => const StreamExample()),
+            createRouter('Sliver Example', () => const SliverExample())
           ],
         ),
       ),
@@ -159,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   Widget createRouter(String text, Widget create()) {
-    return MaterialButton(onPressed: () {
+    return ElevatedButton(onPressed: () {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return create();
       }));

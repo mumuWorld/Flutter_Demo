@@ -67,7 +67,7 @@ class _StreamExampleState extends State<StreamExample> {
               },
               child: Text("关闭sink"),),
             StreamBuilder(
-              stream: controller.stream.distinct(), //会判断值一致就不会builder
+              stream: controller.stream.distinct(), //distinct 会判断值一致就不会builder
               builder: (context, snapshot) {
                 print("收到 value-> ${snapshot.data}");
                 switch (snapshot.connectionState) {
