@@ -6,6 +6,7 @@ import 'package:mm_flutter_example/FBExample.dart';
 import 'package:mm_flutter_example/FutureTest.dart';
 import 'package:mm_flutter_example/ListExample.dart';
 import 'package:mm_flutter_example/ListGame.dart';
+import 'package:mm_flutter_example/NestScrollExample.dart';
 import 'package:mm_flutter_example/SliverExample.dart';
 import 'package:mm_flutter_example/StreamExample.dart';
 
@@ -148,7 +149,8 @@ class _MyHomePageState extends State<MyHomePage>
             ),
             createRouter('FutureBuilder Example', () => const FBExample()),
             createRouter('Stream', () => const StreamExample()),
-            createRouter('Sliver Example', () => const SliverExample())
+            createRouter('Sliver Example', () => const SliverExample()),
+            createRouter('嵌套滚动 example', () => const NestedScrollExample())
           ],
         ),
       ),
