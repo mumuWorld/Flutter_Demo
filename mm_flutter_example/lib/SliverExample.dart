@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mm_flutter_example/CommonCreateTool.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class SliverExample extends StatefulWidget {
@@ -8,10 +9,13 @@ class SliverExample extends StatefulWidget {
   State<SliverExample> createState() => _SliverExampleState();
 }
 
-class _SliverExampleState extends State<SliverExample> with SingleTickerProviderStateMixin {
+class _SliverExampleState extends State<SliverExample>
+    with SingleTickerProviderStateMixin {
   late RefreshController _refreshController;
+  late RefreshController _refreshController2;
   late ScrollController _listController;
   late TabController _tabController;
+  late ScrollController _mainScrollController;
 
   int curPage = 0;
 
@@ -20,7 +24,9 @@ class _SliverExampleState extends State<SliverExample> with SingleTickerProvider
   @override
   void initState() {
     _refreshController = RefreshController();
+    _refreshController2 = RefreshController();
     _listController = ScrollController();
+    _mainScrollController = ScrollController();
     _tabController = TabController(length: 2, vsync: this);
     super.initState();
   }
@@ -28,8 +34,10 @@ class _SliverExampleState extends State<SliverExample> with SingleTickerProvider
   @override
   void dispose() {
     _refreshController.dispose();
+    _refreshController2.dispose();
     _listController.dispose();
     _tabController.dispose();
+    _mainScrollController.dispose();
     super.dispose();
   }
 
@@ -40,107 +48,86 @@ class _SliverExampleState extends State<SliverExample> with SingleTickerProvider
     // //找到父类的state
     // (context as Element).findAncestorStateOfType();
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          const SliverAppBar(
-            title: Text('Sliver App Bar'),
-            expandedHeight: 100, //拉伸后高度。
-            stretch: true, //可拉伸
-            flexibleSpace: FlexibleSpaceBar(
-              background: FlutterLogo(),
-              title: Text('FlexibleSpaceBar Title'),
-              collapseMode: CollapseMode.none,
-              stretchModes: [
-                //拉伸模式
-                StretchMode.blurBackground,
-                StretchMode.fadeTitle
+      body: SmartRefresher(
+        controller: _refreshController,
+        enablePullUp: true,
+        enablePullDown: true,
+        onRefresh: () {
+          dropdownRefreshData(_refreshController);
+        },
+        onLoading: () {
+          loadmore(_refreshController);
+        },
+        header: CommonCreateTool.createRefreshHeader(),
+        child: CustomScrollView(
+          controller: _mainScrollController,
+          physics: ClampingScrollPhysics(),
+          slivers: [
+            CommonCreateTool.createAppBar(),
+            CommonCreateTool.createHeader(),
+            // SliverToBoxAdapter(
+            //   child: Placeholder(),
+            // ),
+            SliverList(
+              delegate: SliverChildListDelegate([
+                FlutterLogo(
+                  size: 100,
+                ),
+              ])),
+          SliverFillRemaining(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                createRefreshList(),  //嵌套的scroll
+                ListView.builder(
+                    itemCount: 30,
+                    controller: _listController,
+                    // physics: ClampingScrollPhysics(),
+                    itemBuilder: (BuildContext context, int index) {
+                      return SizedBox(
+                          height: 30, child: Text('这个index -> $index'));
+                    }),
               ],
             ),
           ),
-          SliverToBoxAdapter(
-            child: Placeholder(),
-          ),
-          SliverList(
-              delegate: SliverChildListDelegate([
-            FlutterLogo(
-              size: 50,
-            ),
-            FlutterLogo(
-              size: 100,
-            ),
-            FlutterLogo(
-              size: 150,
-            )
-          ])),
-          SliverFillRemaining(
-            child: NotificationListener<ScrollNotification>(
-              onNotification: (notify) {
-                print('test-> ${notify.metrics.pixels}');
-                return true;
-              },
-              child: TabBarView(
-                controller: _tabController,
-                  children: [
-                    NestedScrollView(
-                      headerSliverBuilder:
-                          (BuildContext context, bool innerBoxIsScrolled) {
-                        // 返回一个 Sliver 数组给外部可滚动组件。
-                        return <Widget>[
-                        //   SliverAppBar(
-                        //     title: const Text('嵌套ListView'),
-                        //     pinned: true, // 固定在顶部
-                        //     forceElevated: innerBoxIsScrolled,
-                        //   ),
-                          buildSliverList(5), //构建一个 sliverList
-                            // Container()
-                        ];
-                      },
-                      body: createRefreshList()
-                    ),
-                    ListView.builder(
-                        itemCount: 30,
-                        controller: _listController,
-                        // physics: ClampingScrollPhysics(),
-                        itemBuilder: (BuildContext context, int index) {
-                          return Container(
-                              height: 30, child: Text('这个index -> $index'));
-                        }),
-                  ],
-                ),
-              ),
-            ),
-        ],
+          ],
+        ),
+      ),
+      floatingActionButton: ElevatedButton(
+        onPressed: () {
+          int nextIndex = _tabController.index == 1 ? 0 : 1;
+          _tabController.index = nextIndex;
+        },
+        child: const Icon(Icons.cameraswitch),
       ),
     );
   }
 
   Widget createRefreshList() {
-    return SmartRefresher(
-      controller: _refreshController,
-      enablePullUp: true,
-      enablePullDown: true,
-      onRefresh: () {
-        dropdownRefreshData();
+    return NotificationListener(
+      onNotification: (event) {
+        return true;
       },
-      header: ClassicHeader(
-        idleText: "下拉同步句子收藏",
-        releaseText: "松开同步句子收藏",
-        refreshingText: "句子收藏同步中",
-        completeText: "已同步为最新",
-        failedText: "同步失败，请重试",
-        idleIcon: FlutterLogo(),
-        releaseIcon: FlutterLogo(),
-        refreshingIcon: FlutterLogo(),
-        failedIcon: FlutterLogo(),
-        completeIcon: FlutterLogo(),
+      child: SmartRefresher(
+        controller: _refreshController2,
+        enablePullUp: true,
+        enablePullDown: true,
+        onRefresh: () {
+          dropdownRefreshData(_refreshController2);
+        },
+        onLoading: () {
+          loadmore(_refreshController2);
+        },
+        header: CommonCreateTool.createRefreshHeader(),
+        footer: CommonCreateTool.createFooter(),
+        child: ListView.builder(
+            itemCount: 30,
+            controller: _listController,
+            physics: ClampingScrollPhysics(),
+            itemBuilder: (BuildContext context, int index) {
+              return Container(height: 30, child: Text('这个index -> $index'));
+            }),
       ),
-      child: ListView.builder(
-          itemCount: 30,
-          controller: _listController,
-          // physics: ClampingScrollPhysics(),
-          itemBuilder: (BuildContext context, int index) {
-            return Container(height: 30, child: Text('这个index -> $index'));
-          }),
     );
   }
 
@@ -149,7 +136,7 @@ class _SliverExampleState extends State<SliverExample> with SingleTickerProvider
     return SliverFixedExtentList(
       itemExtent: 50,
       delegate: SliverChildBuilderDelegate(
-        (context, index) {
+            (context, index) {
           return ListTile(title: Text('$index'));
         },
         childCount: count,
@@ -157,7 +144,13 @@ class _SliverExampleState extends State<SliverExample> with SingleTickerProvider
     );
   }
 
-  void dropdownRefreshData() {
+  void loadmore(RefreshController controller) {
+    Future.delayed(Duration(seconds: 2),() {
+      controller.loadComplete();
+    });
+  }
+
+  void dropdownRefreshData(RefreshController controller) {
     // try {
     isRefreshing = true;
     if (curPage <= 0) {
@@ -167,7 +160,7 @@ class _SliverExampleState extends State<SliverExample> with SingleTickerProvider
       //     await fetchData(pageNum: pageNum);
     }
     Future.delayed(Duration(seconds: 2), () {
-      _refreshController.refreshCompleted();
+      controller.refreshCompleted();
     });
     // } catch (e) {
     //   pullDownRefreshController.refreshFailed();
