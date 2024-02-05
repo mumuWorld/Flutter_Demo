@@ -5,21 +5,31 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 class CommonCreateTool {
 
   static Widget createAppBar() {
-    return const SliverAppBar(
+    return SliverAppBar(
         title: Text('Sliver App Bar'),
         // expandedHeight: 100, //拉伸后高度。
         // stretch: true, //可拉伸
-        pinned: true,
+        pinned: false,
         flexibleSpace: FlexibleSpaceBar(
-          background: FlutterLogo(size: 100,),
           title: Text('FlexibleSpaceBar Title'),
-          collapseMode: CollapseMode.none,
-          stretchModes: [
-            //拉伸模式
-            StretchMode.blurBackground,
-            StretchMode.fadeTitle
-          ],
-        )
+          background: Container(
+            color: Colors.pink,
+              child:
+          Column(
+            children: [
+              Text('data'),
+              FlutterLogo(size: 50,),
+            ],
+          ))
+          ),
+          // collapseMode: CollapseMode.none,
+          // stretchModes: [
+          //   //拉伸模式
+          //   StretchMode.blurBackground,
+          //   StretchMode.fadeTitle
+          // ],
+
+        // )
     );
   }
 
@@ -32,7 +42,11 @@ class CommonCreateTool {
         child: Row(
           children: [
             Text('Header text 1'),
-            Text('Header text 2')
+            Text('Header text 2'),
+            Container(
+              height: 20,
+              color: Colors.red[200]
+            )
           ],
         )
       ),
@@ -52,11 +66,13 @@ class CommonCreateTool {
 
   static Widget createRefreshHeader() {
     return ClassicHeader(
-      idleText: "下拉同步句子收藏",
+      idleText: "下拉同步句子收藏sdfds",
       releaseText: "松开同步句子收藏",
       refreshingText: "句子收藏同步中",
       completeText: "已同步为最新",
       failedText: "同步失败，请重试",
+      canTwoLevelText: '二楼打开提示',
+      canTwoLevelIcon: FlutterLogo(),
       idleIcon: FlutterLogo(),
       releaseIcon: FlutterLogo(),
       refreshingIcon: FlutterLogo(),

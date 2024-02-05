@@ -1,21 +1,27 @@
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:mm_flutter_example/Animation/AnimationDemo.dart';
 import 'package:mm_flutter_example/FBExample.dart';
 import 'package:mm_flutter_example/FutureTest.dart';
 import 'package:mm_flutter_example/ListExample.dart';
 import 'package:mm_flutter_example/ListGame.dart';
 import 'package:mm_flutter_example/NestScrollExample.dart';
 import 'package:mm_flutter_example/SliverExample.dart';
+import 'package:mm_flutter_example/State/mm_provider_example.dart';
+import 'package:mm_flutter_example/State/mm_state_example.dart';
 import 'package:mm_flutter_example/StreamExample.dart';
+import 'package:mm_flutter_example/mm_custom_scroll_page.dart';
+import 'package:mm_flutter_example/simple/bar_test.dart';
+import 'package:mm_flutter_example/simple/mm_layout_widget.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp();
 
   // This widget is the root of your application.
   @override
@@ -40,7 +46,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({required this.title});
 
   final String title;
 
@@ -52,11 +58,27 @@ class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   int _counter = 0;
 
+  List<Widget> _list = [];
+
   @override
   void initState() {
-    //让所有动画变慢
-    timeDilation = 5.0;
+    //让所有动画变慢， 1.0正常， 越大越慢
+    // timeDilation = 1.0;
     super.initState();
+    _list = [
+      createRouter('FutureBuilder Example', () => const FBExample()),
+      createRouter('Stream', () => const StreamExample()),
+      createRouter('Sliver Example', () => const SliverExample()),
+      createRouter('嵌套滚动 example', () => const NestedScrollExample()),
+      createRouter('动画 example', () => const AnimationDemo()),
+      createRouter('布局示例 example', () => const MMLayoutWidgetExample()),
+      createRouter('bar example', () => const MMBarTestExample()),
+      createRouter('打开提示页', () => const ListGame()),
+      createRouter('打开提示页', () => const ListExample()),
+      createRouter('state example', () => const MMStateExample()),
+      createRouter('provider example', () => const MMProviderExample()),
+      createRouter('MMCustomScrollPage',() => const MMCustomScrollPage()),
+    ];
   }
 
   void _incrementCounter() {
@@ -90,70 +112,11 @@ class _MyHomePageState extends State<MyHomePage>
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-            AnimatedContainer(
-              duration: Duration(seconds: 2),
-              child: Container(),
-            ),
-            Flex(direction: Axis.horizontal),
-            ElevatedButton(
-              onPressed: () async {
-                // 打开`TipRoute`，并等待返回结果
-                var result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return ListGame(
-                          // 路由参数
-                          // text: "我是提示xxxx",
-                          );
-                    },
-                  ),
-                );
-                //输出`TipRoute`路由返回结果
-                print("路由返回值: $result");
-              },
-              child: Text("打开提示页"),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                // 打开`TipRoute`，并等待返回结果
-                var result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return ListExample(
-                          // 路由参数
-                          // text: "我是提示xxxx",
-                          );
-                    },
-                  ),
-                );
-                //输出`TipRoute`路由返回结果
-                print("路由返回值: $result");
-              },
-              child: Text("打开提示页"),
-            ),
-            createRouter('FutureBuilder Example', () => const FBExample()),
-            createRouter('Stream', () => const StreamExample()),
-            createRouter('Sliver Example', () => const SliverExample()),
-            createRouter('嵌套滚动 example', () => const NestedScrollExample())
-          ],
-        ),
-      ),
+      body: ListView.builder(
+        itemCount: _list.length,
+          itemBuilder: (BuildContext context, int index) {
+        return _list[index];
+      }),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',

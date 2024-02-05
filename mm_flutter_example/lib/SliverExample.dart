@@ -17,6 +17,7 @@ class _SliverExampleState extends State<SliverExample>
   late TabController _tabController;
   late ScrollController _mainScrollController;
 
+  late ScrollController _refreshScrollController;
   int curPage = 0;
 
   bool isRefreshing = false;
@@ -27,7 +28,11 @@ class _SliverExampleState extends State<SliverExample>
     _refreshController2 = RefreshController();
     _listController = ScrollController();
     _mainScrollController = ScrollController();
+    _refreshScrollController = ScrollController();
     _tabController = TabController(length: 2, vsync: this);
+    _refreshScrollController.addListener(() {
+      print('text->${_refreshScrollController.position.pixels}');
+    });
     super.initState();
   }
 
@@ -38,11 +43,13 @@ class _SliverExampleState extends State<SliverExample>
     _listController.dispose();
     _tabController.dispose();
     _mainScrollController.dispose();
+    _refreshScrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // _mainScrollController.jumpTo(value)
     // //从父类查找类型
     // context.dependOnInheritedWidgetOfExactType();
     // //找到父类的state
@@ -52,6 +59,11 @@ class _SliverExampleState extends State<SliverExample>
         controller: _refreshController,
         enablePullUp: true,
         enablePullDown: true,
+        enableTwoLevel: true,
+        onTwoLevel: (bool isOpen) {
+          print('test');
+          _refreshController.twoLevelComplete();
+        },
         onRefresh: () {
           dropdownRefreshData(_refreshController);
         },
@@ -79,14 +91,21 @@ class _SliverExampleState extends State<SliverExample>
               controller: _tabController,
               children: [
                 createRefreshList(),  //嵌套的scroll
-                ListView.builder(
-                    itemCount: 30,
-                    controller: _listController,
-                    // physics: ClampingScrollPhysics(),
-                    itemBuilder: (BuildContext context, int index) {
-                      return SizedBox(
-                          height: 30, child: Text('这个index -> $index'));
-                    }),
+                Container(
+                  color: Colors.blue[200],
+                  child: ListView.builder(
+                      padding: EdgeInsets.all(0),
+
+                      itemCount: 30,
+                      controller: _listController,
+                      // physics: ClampingScrollPhysics(),
+                      itemBuilder: (BuildContext context, int index) {
+                        return SizedBox(
+                            height: 30, child: Container(
+                          color: Colors.red[200],
+                            child: Text('这个index -> $index')));
+                      }),
+                ),
               ],
             ),
           ),
@@ -103,15 +122,35 @@ class _SliverExampleState extends State<SliverExample>
     );
   }
 
+  Widget createList() {
+    return Container(
+      margin: EdgeInsets.only(top: 0),
+      color: Colors.yellow[200],
+      child: ListView.builder(
+        padding: EdgeInsets.all(0),
+          shrinkWrap: true,
+          itemCount: 30,
+          controller: _listController,
+          physics: ClampingScrollPhysics(),
+          itemBuilder: (BuildContext context, int index) {
+            return Container(height: 30, child: Text('这个index -> $index'));
+          }),
+    );
+  }
+
   Widget createRefreshList() {
-    return NotificationListener(
-      onNotification: (event) {
-        return true;
-      },
+    return Container(
+      color: Colors.green[200],
       child: SmartRefresher(
         controller: _refreshController2,
         enablePullUp: true,
-        enablePullDown: true,
+        enablePullDown: false,
+        enableTwoLevel: true,
+        scrollController: _refreshScrollController,
+        onTwoLevel: (bool isOpen){
+          print('test 11');
+          // _refreshController2.twoLevelComplete();
+        },
         onRefresh: () {
           dropdownRefreshData(_refreshController2);
         },

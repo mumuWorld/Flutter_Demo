@@ -1,0 +1,13 @@
+# Read about `build.yaml` at https://pub.dartlang.org/packages/build_config
+# https://stackoverflow.com/questions/30652422/how-to-develop-a-dart-library-locally
+# https://github.com/dart-lang/json_serializable
+# https://www.dartlang.org/guides/libraries/create-library-packages
+#
+builders:
+  JSBridgeImpGeneratorBuilder:
+    import: "package:flutter_jsbridge_builder/builder.dart"
+    builder_factories: ["getJSBridgeImpGeneratorBuilder"]
+    build_extensions: {".dart": ["flutter_jsbridge_builder.g.part"]}
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]
